@@ -7,7 +7,7 @@ import seaborn as sns
 st.set_page_config(page_title="Adidas US Sales Dashboard", layout="wide")
 st.title("👟 Adidas US Sales Data Dashboard")
 
-data = pd.read_csv("<https://raw.githubusercontent.com/myoh0623/dataset/refs/heads/main/adidas_us_sales_datasets.csv>")
+data = pd.read_csv("https://raw.githubusercontent.com/myoh0623/dataset/refs/heads/main/adidas_us_sales_datasets.csv")
 data.columns = data.columns.str.strip()
 
 for col in ["Price per Unit", "Total Sales", "Operating Profit"]:
@@ -27,7 +27,7 @@ product = st.sidebar.multiselect("Product", options=sorted(data["Product"].dropn
 sales_method = st.sidebar.multiselect("Sales Method  ", options=sorted(data["Sales Method"].dropna().unique()), default=list(data["Sales Method"].dropna().unique()))
 
 filtered = data[
-    data["Region"].isin(resion)&
+    data["Region"].isin(region)&
     data["Retailer"].isin(retailer)&
     data["Product"].isin(product)&
     data["Sales Method"].isin(sales_method)
@@ -36,9 +36,9 @@ filtered = data[
 st.markdown("## 📈 주요 지표")
 k1, k2, k3, k4 = st.columns(4)
 k1. metric("총 매출액 ($)", f"{filtered['Total Sales'].sum():,.0f}")
-k2. metric("총 판매수량", f"{filtered['Unit Sold'].sum():,}")
+k2. metric("총 판매수량", f"{filtered['Units Sold'].sum():,}")
 k3. metric("평균 단가 ($)", f"{filtered['Price per Unit'].mean():,.2f}")
-k4. metric("평균 마진율 (%)", f"{filtered['Total Sales'].sum():,.2f}")
+k4. metric("평균 마진율 (%)", f"{filtered['Operating Margin'].sum():,.2f}")
 
 tab1, tab2, tab3 = st.tabs(["트렌드 및 분포","소매점/제품","심화 분석"])
 
@@ -110,9 +110,9 @@ with tab2:
     st.markdown("#### 월별-제품별 판매 피벗테이블")
     pivot = pd.pivot_table(
         filtered,
-        index=filtered["Invoice Date"].dt.to_period("M")
-        columns = "product"
-        values="Units Sold"
+        index = filtered["Invoice Date"].dt.to_period("M"),
+        columns = "Product",
+        values = "Units Sold",
         aggfunc = "sum"
     ).fillna(0)
     st.dataframe(pivot.astype(int))
